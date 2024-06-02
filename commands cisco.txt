@@ -1,0 +1,624 @@
+Router(config)#erase startup-config
+Router(config)#reload
+R1(config-if)#clock rate 128000	   int Serial only
+R1#show running-config	R1#show run
+a. Désactivez la recherche DNS    R(config)#no ip domain-lookup
+c. Attribuez mot de passe du mode d’exécution privilégié
+R(config)#enable secret class
+d. Attribuez cisco comme mots de passe de console et vty.
+R1(config)#line console 0   /  line vty 0 4
+R1(config-line)#password cisco 
+R1(config-line)#login
+R1(config-line)#logging synchronous
+R#copy running-config startup-config
+R(config)#ip http server        R(config)#banner motd #hhhhh#         
+R1(config-if)#description #h#	 Win#ipconfig 1.1.1.2 255..0 1.1.1.1
+------------------------vlan---------------------------------------
+S1(config)#vlan 20
+S1(config-vlan)#name Students
+S1#show vlan brief
+
+Attribution de ports aux VLAN
+S2(config)#interface fa0/11
+S2(config-if)#switchport mode access
+S2(config-if)#switchport access vlan 10
+
+Configuration des liaisons trunk IEEE 802.1q
+S1(config)#interface g0/1
+S1(config-if)#switchport mode trunk 
+S1(config-if)#switchport trunk native vlan 99
+S1(config-if)#switchport trunk allowed vlan 99      vlan add/remove 99
+S1#show interfaces f0/1 switchport
+
+Routage traditionell   R(config)#ip routing
+S1(config)#interface vlan 99
+S1(config-if)#ip address 172.31.99.1 255.255.255.0
+S1(config-if)#ip default-gateway 192.168.1.1
+Routage par commutateur     S1(config-if)#switchport trunk encapsulation dot1q
+--------routage-inter-vlan------------ Routage on a stick-------------------
+R1(config-if)#interface g0/1.10
+R1(config-subif)#encapsulation dot1Q 10	/   99 native
+R1(config-subif)#ip address 172.17.10.1 255.255.255.0
+
+ Vérification de Routage inter-VLAN «Router-on-a-Stick»
+•	show ip route	show ip interface brief	show interfaces     trunk
+----------------------------------------vtp----------------------------------------
+Étape 1 configurez le serveur VTP
+S1# configure terminal
+S1(config)# vtp domain cisco1 
+S1(config)# vtp password 123456
+S1(config)# vtp version 2
+S1(config)# exit
+S1# show vtp status
+S1# show vlan brief
+
+Étape 2 configurez les clients VTP 
+S2(config)# vtp domain cisco1 
+S2(config)# vtp mode client / transport
+S2(config)# exit
+S2# show vtp status 
+
+Étape 3 confirmez et connectez
+show vtp counters
+
+DTP - Modes d'interface négociés
+prennent en charge les modes trunk suivants :
+•	S1(config-if)# switchport mode dynamic auto
+•	S1(config-if)# switchport mode dynamic desirable
+•	S1(config-if)# switchport mode trunk
+•	S1(config-if)# switchport nonegotiate
+
+----------------------------------------stp----------------------------
+Switch(config-if)# sanning-tree vlan 1 port-priority 112        ‘0-240’
+Switch(config)# spanning-tree vlan 1 root primary
+Switch(config)# spanning-tree vlan 1 root secondary
+Switch(config)# spanning-tree vlan 1 root primary.24576/(secondary.28672)
+Switch(config)# spanning-tree vlan 1 priority 4096     ++4096 +1vlan      ‘0-61440’
+Switch# show spanning-tree
+
+La commande d'interface spanning-tree link-type point-to-point désigne un port particulier 
+en tant que liaison point à point (sans rattachement à un concentrateur).
+La commande de mode privilégié clear spanning-tree detected-protocols est utilisée pour 
+effacer le protocole STP.   Et  Disactivation de tous les protocoles STP
+Switch# clear spanning-tree detected-protocols
+
+La valeur de plage peut être comprise entre 1 et 200 000 000
+Switch(config-if)# spanning-tree cost 25
+
+la commande spanning-tree vlan 1 root primary diameter 5 en mode de configuration globale 
+a été saisie pour attribuer à l’arbre recouvrant un diamètre de cinq commutateurs.
+-----------------------------pvst-------------------------------------
+S1(config)#spanning-tree mode pvst
+S1(config)#spanning-tree vlan 1,10,30,50,70 root primary
+S2(config)#spanning-tree vlan 1,10,20,30,40,50,60,70,80,99 root secondary
+S1#show spanning-tree
+
+*****Rapide PVST+*********
+Switch(config)# spanning-tree mode rapid-pvst
+
+******portfast***********************
+S1(config)# int Fa0/6
+S1(config-if)# spanning-tree portfast
+***bpduguard***********************
+S1(config)# int Fa0/6
+S1(config-if)# spanning-tree bpduguard enable
+
+--------------------etherchannel------------------------------
+S1(confg)# int range Fa0/1-2
+S1(confg-if-range)# channel-group 1 mode active //on = sans protocole
+S1(confg-if-range)# int port-channel 1
+
+Verification de EtherChannel
+show interface Port-channel – affiche l'état général de l'interface de port-channel..
+show etherchannel summary – pour afficher une ligne d'informations unique par canal de port.
+show etherchannel port-channel – pour afficher des informations concernant une interface port-channel spécifique.
+show interfaces etherchannel – peut fournir des informations sur le rôle de l'interface dans l'EtherChannel
+
+*********pagp******************************
+S1(config)# interface range f0/3-4
+S1(config-if-range)# channel-group 1 mode desirable
+Creating a port-channel interface Port-channel 1
+S1(config-if-range)# no shutdown
+
+S3(config)# interface range f0/3-4
+S3(config-if-range)# channel-group 1 mode auto
+Creating a port-channel interface Port-channel 1
+S3(config-if-range)# no shutdown
+S1# show interfaces f0/3 switchport
+S1# show etherchannel summary
+
+S1(config)# interface port-channel 1
+S1(config-if)# switchport mode trunk
+S1(config-if)# switchport trunk native vlan 99
+
+**********lacp*******************
+S2(config)# interface range f0/3-4
+S2(config-if-range)# switchport mode trunk
+S2(config-if-range)# switchport trunk native vlan 99
+S2(config-if-range)# channel-group 3 mode active
+S2(config-if-range)# no shutdown
+
+S1(config)# interface port-channel 3
+S1(config-if)# switchport mode trunk
+S1(config-if)# switchport trunk native vlan 99
+
+S3(config)# interface range f0/1-2
+S3(config-if-range)# switchport mode trunk
+S3(config-if-range)# switchport trunk native vlan 99
+S3(config-if-range)# channel-group 3 mode passive
+S3(config-if-range)# no shutdown
+S2# show interface po1
+S1(config)# interface port-channel 3
+S1(config-if)# switchport mode trunk
+S1(config-if)# switchport trunk native vlan 99
+
+------------------------hsrp-------------------------------------------
+R1(config)# interface g0/1	R1(config-if)# ip addr 192.168.0.2.1 255.255.255.0 
+R1(config-if)# standby version 2 
+R1(config-if)# standby 1 ip 192.168.1.254 255.255.255.0
+R1(config-if)# standby 1 priority 150
+R1(config-if)# standby 1 preempt
+R2(config)# interface g0/2
+R2(config-if)# standby 1 ip 192.168.1.254 255.255.255.0
+R2(config-if)# standby 1 priority 150
+R2(config-if)# standby 1 preempt
+débogage HSRP     R1# debug standby ? (errors/events/packets)    
+R1# show standby    brief
+*******glbp************** 
+R1(config)# interface g0/1
+R1(config-if)# glbp 1 ip 192.168.1.254 255.255.255.0
+R1(config-if)# glbp 1 preempt
+R1(config-if)# glbp 1 priority 150
+R1(config-if)# glbp 1 load-balancing round-robin
+R2(config)# interface g0/1
+R2(config-if)# glbp 1 ip 192.168.1.254 255.255.255.0
+R2(config-if)# glbp 1 preempt
+R2(config-if)# glbp 1 load-balancing round-robin
+R1# show glbp brief
+-------------------------------------------------------------------------------------------
+ Configuration d'un serveur DHCPv4
+R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.9
+R1(config)# ip dhcp pool R1LAN
+R1(dhcp-config)# network 192.168.10.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.10.1 
+R1(dhcp-config)# dns-server 192.168.20.254
+R1(dhcp-config)# netbios-name-server 192.168.20.254
+R1(dhcp-config)# lease 7
+Pour désactiver le DHCP : no service dhcp
+Vérification d'un serveur DHCPv4       show running-config | section dhcp	  
+show ip dhcp binding	 show ip dhcp server statistics 
+
+Relais DHCPv4	R1(config)#Int g0/0
+R1(config-if)#ip helper-address 192.168.0.1
+Config SLAAC
+R1(config)# ipv6 unicast-routing
+S2(config)# interface vlan 1
+S2(config-if)# ipv6 address autoconfig
+Option DHCP sans état :	L'indicateur O doit être modifié pour 
+passer de 0 à 1 à l'aide de la commande d'interface 
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 dhcp pool PPL1
+R1(dhcpv6-config)# dns-server 2001 :db8 :cafe :aaaa ::5
+R1(dhcpv6-config)# domain name ista.ma
+R1(config)# interface g0/1
+R1(config-if)# ipv6 dhcp server PPL1
+R1(dhcpv6-config)# ipv6 nd other-config-flag
+Configure un routeur en tant que client DHCPv6 sans etat
+R1(config)# interface g0/1
+R1(config-if)# ipv6 enable
+R1(config-if)# ipv6 address autoconfig
+
+Option DHCPv6 avec état 
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 dhcp pool PPL1
+R1(dhcpv6-config)# address prefix 2001 :db8 :cafe :1 ::/64 lifetime infinite
+R1(dhcpv6-config)# dns-server 2001 :db8 :cafe :aaaa ::5
+R1(dhcpv6-config)# domain name ista.ma
+
+R1(config)# interface g0/1
+R1(config-if)# ipv6 address 2001 :db8 :cafe :1 ::1/64
+R1(config-if)# ipv6 dhcp server PPL1
+R1(config-if)# ipv6 nd managed-config-flag. 
+
+Configure un routeur en tant que client DHCPv6 avec etat
+R1(config)# interface g0/1
+R1(config-if)# ipv6 enable
+R1(config-if)# ipv6 address dhcp
+
+Vérifiez le serveur DHCPv6 avec état en utilisant :
+		 show ipv6 dhcp pool
+		 show ipv6 dhcp binding
+Vérifiez le client DHCPv6 avec état en utilisant :
+		 show ipv6 interface
+
+Configuration d'un routeur en tant qu'agent de relais DHCPv6 avec état
+R1(config)# interface g0/0
+R1(config-if)# ipv6 dhcp relay destination 2001 :db8 :cafe :1 ::6
+
+------------------------------------------------------------
+Configuration d’une route statique
+R1(config)# ip route (network-address) (subnet-mask)  (ip-address) |  exit-interface
+Affichage de la table de routage      show ip route.
+Route statique par défaut
+ip route 0.0.0.0 0.0.0.0 1.1.1.1
+ipv6 route ::/0 2001:DB8:ACAD:4::2
+Route statique flottante
+ip route 0.0.0.0 0.0.0.0 1.1.1.1 5(distance administrative)
+
+------------------------------------------------------------
+Configuration du base de protocole RIPv1:
+R3(config)#router rip
+R3(config)#version 1
+R3(config-router)#network 192.168.4.0
+R3(config-router)#network 192.168.5.1
+
+Désactivation de résumé automatique dans RIPv2
+R3(config-router)#no auto-summary
+
+Propagation d'une route par défaut
+R2(config)#ip route 0.0.0.0 0.0.0.0 209.165.200.226
+R2(config-router)#default-information originate
+
+Redistribution des routes statiques
+R2(config-router)#redistribute static
+
+La commande debug ip rip : interprétation
+Dépannage d’une route manquante
+traceroute	-	show ip route
+show ip interface brief
+show cdp neighbors
+Vérification et dépannage de RIPv2
+show ip interface brief	show ip route          debug ip rip	
+Ping       show running-config
+
+------------------------------------------------------------
+Configuration OSPF Zone unique
+R1(config)# router ospf 10 0>65535
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# auto-cost reference-bandwidth 1000
+R1(config-router)# network 10.10.10.0 0.0.0.255 area 0
+
+R1(config-router)# passive-interface g0/0 
+
+Les commandes d'interface bandwidth et ip ospf cost produisent toutes deux le même résultat 
+: elles fournissent une valeur précise qu'OSPF utilise pour déterminer la meilleure route.
+command :   R1(config-if)# ip ospf cost 15625 
+
+Réglage de la bande passante des interfaces
+R1(config)# int g0/0
+R1(config-if)# bandwidth 1000000
+
+Réglage de la bande passante de référence
+Avec la commande  auto-cost reference-bandwidth     À effectuer sur chaque routeur du domaine OSPF
+Notez que la valeur est exprimée en Mbit/s :
+Gigabit Ethernet : R1(config-router)# auto-cost reference-bandwidth 1000
+10 Gigabit Ethernet : R1(config-router)# auto-cost reference-bandwidth 10000
+
+Priorité OSPF
+R1(config)#int f0/0     R1(config-if)# ip ospf priority  Valeur Default=1  (commande d'interface OSPFv2)
+	R1(config-if)# ipv6 ospf priority  Valeur Default=1  (commande d'interface OSPFv3)
+
+Base de données d'états de liens : Table de topologique : show ip ospf : Les routeurs OSPF échangent des paquets.
+Vérification des voisins OSPF command : show ip ospf neighbor
+Vérification des paramètres du protocole OSPF command : show ip ospf protocol
+Vérification des paramètres d'interface OSPF command : show ip ospf interface brief
+show ip ospf neighbor
+show ip protocols
+show ip ospf
+show ip ospf interface
+show ip ospf interface brief 
+Désactivation de résumé automatique
+R1(config-router)#no auto-summary
+
+R1# clear ip ospf process
+
+Propagation d'une route par défaut
+R2(config)#ip route 0.0.0.0 0.0.0.0 209.165.200.226
+R2(config)#router ospf 10
+R2(config-router)#default-information originate
+
+Vérification de la route par défaut propagée
+show ip route | begin Gateway
+
+Modification des intervalles OSPFv2
+R1(config)# interface s0/0/0
+R1(config-if)# ip ospf hello-inteval 5
+R1(config-if)# ip ospf dead-inteval 20
+
+Redistribution des routes statiques
+R1(config-router)# redistribute static
+
+OSPFv3 
+R1(config)# int g0/0
+R1(config-if)# ipv6 adresse fe80::1 link-local
+R1(config-if)#ipv6 address 2001:acad:caf:2::1/64
+
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# auto-cost reference-bandwidth 1000
+R1(config-router)# int g0/0
+R1(config-if)# bandwidth 1000000
+R1(config-if)# ipv6 ospf 10 area 0
+
+Activer route defaut sur R2 en IPv6 pour OSPFv3
+R2(config)# ipv6 unicast-routing 
+R2(config)#ipv6 route ::/0 2001:DB8:FEED:1::2
+R2(config-router)#router ospf 10
+R2(config-router)#default-information originate
+
+Modification des intervalles OSPFv3
+R1(config)# interface s0/0/0
+R1(config-if)# ipv6 ospf hello-inteval 5
+R1(config-if)# ipv6 ospf dead-inteval 20
+Verification de la propagation de route par defaut sur ipv6         show ipv6 route static
+Verification ospf
+show ipv6 ospf neighbor
+show ipv6 protocols
+show ipv6 route ospf
+show ipv6 ospf interface brief
+
+Vérification des intervalles OSPFv3 de l’interface
+show ip ospf interface s0/0 | include Timer
+show ip ospf neighbor
+
+Configuration de l'authentification MD5 OSPF
+R1(config)# router ospf 10
+R1(config-router)# area (area-id) authentication message-digest (en mode de configuration de routeur) 
+R1(config-if)# ip ospf message-digest-key 1(key) md5 (password) (commande de mode de configuration d'interface)
+
+
+Pour activer l'authentification MD5 par interface, exécutez les commandes suivantes :
+R1(config)# int g0/0 
+R1(config-if)# ip ospf authentication message-digest (commande de mode de configuration d'interface
+R1(config-if)# ip ospf message-digest-key 1(key) md5 (password) (commande de mode de configuration d'interface)
+
+Vérification de l'authentification MD5 OSPF
+show ip ospf interface | include Message
+show ip route ospf
+
+Commandes de dépannage OSPF
+show ip protocols – pour vérifier des informations de configuration OSPF essentielles.
+show ip ospf neighbor  – pour vérifier que le routeur a établi une contiguïté avec ses routeurs voisins. 
+show ip ospf interface  – pour afficher les paramètres OSPF configurés sur une interface, tels que l'ID de processus OSPF.
+show ip ospf  – pour examiner l'ID de processus OSPF et l'ID de routeur. 
+show ip route ospf – pour afficher uniquement les routes apprises par OSPF dans la table de routage.
+clear ip ospf [process-id] process – pour réinitialiser les contiguïtés de voisinage OSPFv2.
+Pour vérifier les interfaces OSPF actives, utilisez la commande  show ip ospf interface
+Pour désactiver une interface passive, utilisez la commande de mode de configuration de routeur no passive-interface
+Vérifiez les routes en utilisant la commande  show ip route 
+
+Commandes de dépannage de OSPFv3
+show ipv6 protocols  – pour vérifier des informations de configuration OSPFv3 essentielles.
+show ipv6 ospf neighbor – pour vérifier que le routeur a établi une contiguïté avec ses routeurs voisins.
+show ipv6 ospf interface  – pour afficher les paramètres OSPFv3 configurés sur une interface.
+show ipv6 ospf  –  pour examiner l'ID de processus OSPF et l'ID de routeur.
+show ipv6 route ospf  – pour afficher uniquement les routes apprises par OSPFv3 dans la table de routage. 
+clear ipv6 ospf [process-id] process – pour réinitialiser les contiguïtés de voisinage OSPFv3.
+
+Voir sur chaque routeur si ils ont bien reçu des routes OSPF. Vérifier si les routes inscrites sont exacts et non manquantes.  Show ip route
+Voir sur chaque routeur si ils ont bien reçu la route par défaut.  S* sur le routeur directement connecté à la route par défaut et  O*SE sur les autres routeur.
+Effectuer des ping à partir des usagés de la topologie vers l’adresse de la route par défaut.
+Voir sur chaque routeur le rôle de chacun (DR, BDR, DRothers)  Show ip opsf interface
+Troubleshooting commands: show ip protocols, show ip ospf neighbor, show ip ospf interface, show ip ospf
+Troubleshooting  OSPFv3 commands: show ipv6 protocols, show ipv6 ospf neighbor, show ipv6 ospf interface, show ipv6 ospf, show ipv6 route ospf, and clear ipv6 ospf [process-id] process
+
+------------------------------------------------------------
+OSPF Multi Zones
+OSPFv2 :
+R1(config)# router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# network 10.10.10.0 0.0.0.255 area 0
+R1(config-router)# network 20.20.20.0 0.0.0.255 area 1 
+R1(config-router)# passive-interface g0/0
+
+Liens virtuel to  area 3   O IA  Type 3
+R1(config)# router ospf 10
+R1(config)# area 2 virtual-link 1.1.1.1(neighbor-id)
+
+OSPFv3 :
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# int g0/0
+R1(config-if)# ipv6 ospf 10 area 0
+R1(config-if)# int g0/1
+R1(config-if)# ipv6 ospf 10 area 1
+
+Configuration de la récapitulation (résumé) des routes internes à une zone
+R1(config)# router ospf 10
+R1(config-router)# area 1 range 10.1.0.0 255.255.252.0
+
+Vérification du protocole OSPF à zones multiples 
+Vérification de la LSDB OSPF  show ip ospf database 
+show ip ospf | begin Gateway
+show ip ospf neighbor 
+show ip ospf
+show ip ospf interface
+show ip protocols
+show ip ospf interface brief
+show ip route ospf
+-------------------------------------eigrp---------------------------------------------
+Configuration de l'ID de routeur EIGRP
+Router(config)# router eigrp (autonomous-system)
+Router(config-router)# eigrp router-id (ipv4-address)
+R1(config-router)# network 1.1.1.0  0.0.0.255
+R1(config-router)# network 2.2.2.0  0.0.0.255
+Authentication    R1(config-router)# key chain EIGRP_KEY
+R1(config-keychain)# key 1
+R1(config- keychain-key)# key-string P@ssw0rd
+R1(config-router)# int f0/0    R1(config-if)# ip authentication mode eigrp 10 md5
+R1(config-if)# ip authentication key-chain eigrp 10 EIGRP_KEY
+Configurtion d’une interface de bouclage (Loopback Interface)
+Router(config)# interface loopback number
+Router(config-if)# ip (addressipv4-address) (subnet-mask)
+Configurez d’une route récapitulative manuelle
+R1(config)# interface S0/0/0
+R1(config-if)# ip summary-address eigrp 1 192.168.0.0 255.255.255.0
+Par défaut, la commande de mode de configuration du routeur 
+eigrp log-neighbor-changes est activée.
+
+utilisez l'option wildcard-mask avec la commande network soit: 	
+R1(config-router)# network (network-address) [masque générique wildcard-mask]
+
+Pour configurer:	
+R1(config)# router (eigrp as-number)
+R1(config-router)# passive-interface (interface-type) (interface-number)
+
+Pour verifier:	Router# show ip protocols	-	show ip eigrp neighbors
+
+Métrique composite EIGRP
+R1 (config-router) # metric weights tos k1 k2 k3 k4 k5        
+K1 (bande passante) = 1   K2 (charge) = 0   K3 (délai) = 1   K4 (fiabilité)=0   K5 (fiabilité) = 0
+
+Métrique de bande passante
+R1(config)# interface f0/0
+R1(config-if)# bandwidth 64
+
+Table topologique : commande 
+show ip eigrp topology	via 1.1.1.1 (distance de faisabilité/distance annoncée du successeur) f0/0
+
+Table topologique : aucun successeur potentiel
+show ip eigrp topology all-links
+
+DUAL: Successeur potentiel	debug eigrp fsm	undebug all
+Protocole EIGRP pour IPv6
+Configuration du protocole EIGRP pour le processus de routage IPv6
+R1(config)# ipv6 unicast-routing
+R1(config)# ipv6 router eigrp 2
+R1(config-router)# no shutdown
+R1(config-router)# eigrp router-id 2.0.0.0
+
+Configuration d'adresses link-local IPv6
+R1(config)# int f0/0
+R1(config-if)# ipv6 eigrp 1
+R1(config-if)# ipv6 address fa80::1 link-local
+
+show ipv6 interface brief
+show ipv6 eigrp neighbors
+show ipv6 protocols
+
+------------------------------------------------------------
+Activez le routage BGP.
+Configurez les voisins (homologues) BGP.
+R1(config)# router bgp 1
+R1(config-router)# bgp router-id 1.1.1.1
+R1(config-router)# network 1.1.1.0 mask 255.255.255.0
+R1(config-router)# neighbor 1.1.1.1 remote-as 1
+
+Exemple de configuration du protocole eBGP
+R1(config)# interface Serial 0
+R1(config-if)# ip address 222.222.10.2 255.255.255.252
+R1(config-iif)# router bgp 100
+R1(config-router)# network 220.220.8.0 mask 255.255.255.0
+R1(config-router)# neighbor 222.222.10.1 remote-as 101
+
+Exemple de configuration du protocole iBGP
+R1(config)# interface Serial 1
+R1(config-if)# ip address 220.220.16.2 255.255.255.252
+R1(config-if)# router bgp 101
+R1(config-router)# network 220.220.16.0 mask 255.255.255.0
+R1(config-router)# neighbor 220.220.16.1 remote-as 101
+
+Vérification de la configuration BGP
+show ip bgp
+show ip bgp summary
+show ip bgp neighbors
+show ip bgp paths
+show ip bgp neighbors [address] [received-routes|routes|advertised-routes| {paths regular-expression}|dampened-routes]
+Listes de contrôle d'accès standard
+# access-list 10 permit 192.168.30.0 0.0.0.255
+
+Listes de contrôle d'accès étendues
+access-list 103 permit tcp 192.168.30.0 0.0.0.255 any eq 80
+
+Saisie des instructions pour les critères
+ACL 1	R1 (config) #access-list 1 permit ip 192.168.10.0 0.0.0.255
+ACL 2	R1 (config) #access-list 2 permit ip 192.168.10.0 0.0.0.255 R1 (config) #access-list 2 deny any
+
+Configuration d'une liste de contrôle d'accès standard
+access-list 2 deny host 192.168.10.10
+access-list 2 permit 192.168.10.0 0.0.0.255
+access-list 2 deny 192.168.0.0 0.0.255.255
+access-list 2 permit 192.0.0.0 0.255.255.255
+
+Configuration d'une liste de contrôle d'accès standard (suite)
+Router(config)# access-list access-list-number deny permit remark source [ source-wildcard ] [ log ]
+Le mot-clé remark est utilisé à des fins de documentation et rend les listes de contrôle d'accès bien plus simples à comprendre.
+
+Logique interne
+R1 (config) #access-list 3 deny 192.168.10.0 0.0.0.255
+R1 (config) #access-list 3 permit host 192.168.10.10
+Access rule can't be configured at higher sequence num as it is part of the existing rule at sequence num 10
+ACL 3: l'instruction d'hôte est en conflit avec l'instruction de plage précédente.
+
+Application de listes de contrôle d'accès standard aux interfaces
+Router(config-if)# ip access-group { access-list-number | access-list-name } { in | out }
+Configuration des listes de contrôle d'accès IPv4 standard
+Application de listes de contrôle d'accès standard aux interfaces (suite)
+R1(config)# access-list 1 deny host 192.168.10.10 
+R1(config)# access-list 1 permit any
+R1(config)# interface g0/0
+R1(config)# ip access-group 1 in
+
+Création des listes de contrôle d'accès standard nommées
+R1(config)# ip access-group 1 in
+
+Création des listes de contrôle d'accès standard nommées
+R1(config)# ip access-list standard/extended name 
+R1(config-std-nacl)# permit/deny/remark (masque_generique) (log) 
+R1(config-if)# ip access-group name in/out 
+
+
+Configuration d'une liste de contrôle d'accès standard pour sécuriser un port VTY
+	Router(config-line)# access-class access-list-number { in [ vrf-also ] | out }
+	Router# show access-lists
+
+Configuration des listes de contrôle d'accès étendues
+
+Application des listes de contrôle d'accès étendues aux interfaces
+ 
+Création des listes de contrôle d'accès étendues nommées
+
+
+Configuration des listes de contrôle d'accès pour limiter les résultats du débogage
+L'administrateur de R2 souhaite s'assurer que le trafic est acheminé correctement grâce à la commande    debug ip packet
+
+Comparaison des listes de contrôle d'accès IPv4 et IPv6
+	Application d'une liste de contrôle d'accès IPv6
+IPv6 utilise la commande ipv6 traffic-filter pour effectuer la même tâche sur les interfaces IPv6.
+	Instructions supplémentaires par défaut
+permit icmp any any nd-na
+permit icmp any any nd-ns
+Configuration des listes de contrôle d'accès IPv6
+Il existe trois étapes de base pour configurer une liste de contrôle d'accès IPv6 :
+	En mode de configuration globale, utilisez la commande ipv6 access-list name pour créer une liste de contrôle d'accès IPv6. 
+	En mode de configuration des listes de contrôle d'accès nommées, utilisez les instructions permit ou deny pour spécifier une ou plusieurs conditions pour déterminer si un paquet est transféré ou abandonné.
+	Retournez au mode d'exécution privilégié à l'aide de la commande end.
+ 
+
+Application d'une liste de contrôle d'accès IPv6 à une interface
+Interface s0/0/0
+Ipv6 traffic-filter NO-R3-LAN-ACCESS in
+R1# show ipv6 interface g0/0
+
+Configuration de la NAT statique
+R2(config)# ip nat inside source statix 192.168.10.254 209.165.201.5 
+R2(config)# Interface s0/0/0
+R2(config-if)# ip nat inside
+R2(config)# interface s0/0/1 
+R2(config-if)# ip nat outside
+
+Vérification de la NAT statique 		R2# show ip nat translations
+R2# clear ip nat statistics
+R2# show ip nat statistics
+
+Configuration de la NAT dynamique
+ 
+Vérification de la NAT dynamique	show ip nat translations verbose
+Configuration de la PAT : pool d'adresses
+ 
+Configuration de la PAT : adresse unique
+Vérification de la PAT		R2# show ip nat translations
+Configuration de la redirection avec IOS
+Dépannage de la NAT : commande debug		R2# debug ip nat
