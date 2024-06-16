@@ -1,0 +1,48 @@
+R1(config)# aaa new-model
+R1(config)# 
+R1(config)# radius-server host 192.168.1.100
+R1(config)# radius-server key RADIUS-Pa55w0rd
+R1(config)#
+R1(config)# tacacs-server host 192.168.1.101
+R1(config)# tacacs-server key TACACS+Pa55w0rd single-connection
+R1(config)# 
+R1(config)# aaa authentication login default group tacacs+ group radius local-case
+R1(config)# 
+
+
+
+
+
+
+
+R1# conf t
+R1(config)# username JR-ADMIN secret Str0ngPa55w0rd
+R1(config)# username ADMIN secret Str0ng5rPa55w0rd
+R1(config)# aaa new-model
+R1(config)# aaa authentication login default group tacacs+
+R1(config)# aaa authentication login TELNET-LOGIN local-case
+R1(config)# aaa authorization exec default group tacacs+
+R1(config)# aaa authorization network default group tacacs+
+R1(config)# line vty 0 4
+R1(config-line)# login authentication TELNET-LOGIN
+R1(config-line)# ^Z
+
+
+
+
+
+R1# conf t
+R1(config)# username JR-ADMIN secret Str0ngPa55w0rd
+R1(config)# username ADMIN secret Str0ng5rPa55w0rd
+R1(config)# aaa new-model
+R1(config)# aaa authentication login default group tacacs+
+R1(config)# aaa authentication login TELNET-LOGIN local-case
+R1(config)# aaa authorization exec group tacacs+
+R1(config)# aaa authorization network group tacacs+
+R1(config)# aaa accounting exec start-stop group tacacs+
+R1(config)# aaa accounting network start-stop group tacacs+
+R1(config)# line vty 0 4
+R1(config-line)# login authentication TELNET-LOGIN
+R1(config-line)# ^Z
+
+

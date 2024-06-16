@@ -1,0 +1,6 @@
+S1(config)# interface range fa0/1 - 2 
+S1(config-if-range)# switchport port-security 
+S1(config-if-range)# switchport port-security maximum 1 
+S1(config-if-range)# switchport port-security mac-address sticky 
+S1(config-if-range)# switchport port-security violation restrict 
+S1# show port-security interface fa0/2 

@@ -1,0 +1,7 @@
+S1(config)# service password-encryption 
+S1(config)# ip domain-name netacad.pka 
+S1(config)# crypto key generate rsa  
+S1(config)# username administrator password cisco 
+S1(config-line)# login local 
+S1(config-line)# transport input ssh 
+S1(config-line)# no password cisco  
