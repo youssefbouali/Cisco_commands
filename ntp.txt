@@ -1,0 +1,14 @@
+NTP Network Time Protocol
+Synchronise horloge locale des pc via internet 123 UDP
+use DHCP
+
+Server authentification
+apt install ntp
+https://packages.debian.org/bullseye/ntp
+
+R1#show clock
+R1(config)#ntp server 1.1.1.1
+
+R1(config)#ntp update-calander
+
+R1(config)#clock set 10:00:00 02 Mai 2023

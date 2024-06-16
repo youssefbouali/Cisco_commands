@@ -1,0 +1,60 @@
+HDLC
+
+
+Multi-Point One link : mappage statique - interfaces physique
+
+Nuage Cloud couche 1 et 2 :
+Frame Relay config :
+DLCI 102 - R1-R2
+
+
+R1(config)#interface s0/0
+R1(config)#encapsulation frame-relay
+R1(config)#frame-relay map ip 1.1.1.2 102 broadcast
+R1(config)#frame-relay map ip 1.1.1.3 103 broadcast
+
+
+no frame-relay inverse-arp
+clear frame-relay map
+show frame-relay map
+
+
+in OSPF
+router ospf 1
+ip ospf network broadcast
+
+
+
+
+
+Multi-Point One link : mappage dynamique - Sous interfaces - interfaces virtuelles
+
+R1(config)#interface s0/0
+R1(config)#encapsulation frame-relay
+
+R1(config)#interface s0/0.100 multipoint
+R1(config)#frame-relay interface-dlci 102
+R1(config)#frame-relay interface-dlci 103
+
+
+in OSPF
+router ospf 1
+ip ospf network broadcast
+
+
+
+
+
+Point-to-Point Multi link addresses : 
+
+R1(config)#interface s0/0
+R1(config)#encapsulation frame-relay
+
+R1(config)#interface s0/0.100 point-to-point
+R1(config)#frame-relay interface-dlci 102
+R1(config)#frame-relay interface-dlci 103
+
+
+in OSPF
+router ospf 1
+ip ospf network broadcast

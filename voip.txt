@@ -1,0 +1,90 @@
+
+
+• Configuration :
+- configuration du Switch : 
+Switch#conf t
+Switch(config)#hostname Sw1
+Sw1(config)#ip domain-name voip.ma
+Sw1(config)#vlan 10
+Sw1(config-vlan)#name Data
+Sw1(config-vlan)#exit
+Sw1(config)#vlan 100
+Sw1(config-vlan)#name Voice
+Sw1(config-vlan)#exit
+Sw1(config)#int fa 0/1
+Sw1(config-if)#switchport mode trunk
+Sw1(config-if)#exit
+Sw1(config)#int range fa 0/2 - 3
+Sw1(config-if-range)#switchport mode access
+Sw1(config-if-range)#switchport access vlan 10
+Sw1(config-if-range)#switchport voice vlan 100
+Sw1(config-if-range)#exit
+Sw1(config)#do wr
+
+- Configuration du Routeur :
+Router#conf t
+Router(config)#hostname Rtr1
+Rtr1(config)#ip domain-name voip.ma
+Rtr1(config)#int fa 0/0
+Rtr1(config-if)#no ip add
+Rtr1(config-if)#no sh
+Rtr1(config-if)#exit
+Rtr1(config)#int fa 0/0.10
+Rtr1(config-subif)#encapsulation dot1Q 10
+Rtr1(config-subif)#ip add 192.168.10.1 255.255.255.0
+Rtr1(config-subif)#no sh
+Rtr1(config-subif)#exit
+Rtr1(config)#int fa 0/0.100
+Rtr1(config-subif)#encapsulation dot1Q 100
+Rtr1(config-subif)#ip add 192.168.100.1 255.255.255.0
+Rtr1(config-subif)#no sh
+Rtr1(config-subif)#exit
+Rtr1(config)#do wr
+
+Rtr1(config)#ip dhcp excluded-address 192.168.10.1
+Rtr1(config)#ip dhcp excluded-address 192.168.100.1
+Rtr1(config)#ip dhcp pool Data
+Rtr1(dhcp-config)#network 192.168.10.0 255.255.255.0
+Rtr1(dhcp-config)#default-router 192.168.10.1
+Rtr1(dhcp-config)#option 150 ip 192.168.10.1
+Rtr1(dhcp-config)#exit
+Rtr1(config)#ip dhcp pool Voice
+Rtr1(dhcp-config)#network 192.168.100.0 255.255.255.0
+Rtr1(dhcp-config)#default-router 192.168.100.1
+Rtr1(dhcp-config)#option 150 ip 192.168.100.1
+Rtr1(dhcp-config)#exit
+Rtr1(config)#do wr
+
+Rtr1(config)#telephony-service
+Rtr1(config-telephony)#max-ephones 2
+Rtr1(config-telephony)#max-dn 2
+Rtr1(config-telephony)#ip source-address 192.168.10.1 port 2000
+Rtr1(config-telephony)#ephone-dn 1
+Rtr1(config-ephone-dn)#ephone-dn 2
+Rtr1(config-ephone-dn)#ephone 1
+Rtr1(config-ephone)#mac-address 00D0.BC49.A513
+Rtr1(config-ephone)#type 7960
+Rtr1(config-ephone)#button 1:1
+Rtr1(config-ephone)#exit
+Rtr1(config)#ephone 2
+Rtr1(config-ephone)#mac-address 0002.1634.33A2
+Rtr1(config-ephone)#type 7960
+Rtr1(config-ephone)#button 1:2
+Rtr1(config-ephone)#exit
+Rtr1(config)#dial-peer voice 1000 voip
+Rtr1(config-dial-peer)#destination-pattern 1111
+Rtr1(config-dial-peer)#destination-pattern 2222
+Rtr1(config-dial-peer)#exit
+Rtr1(config)#ephone-dn 1
+Rtr1(config-ephone-dn)#number 1111
+Rtr1(config-ephone-dn)#exit
+Rtr1(config)#ephone-dn 2
+Rtr1(config-ephone-dn)#number 2222
+Rtr1(config-ephone-dn)#exit
+Rtr1(config)#do wr
+
+- Configuration des ordinateurs : 
+Choisir le DHCP afin d'obtenir des @IP automatique.
+
+- Configuration des SoftPhone : 
+Alimenter les SoftPhone et tester des appels

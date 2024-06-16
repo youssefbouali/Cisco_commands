@@ -1,0 +1,31 @@
+Syslog 514 UDP
+using NTP
+
+Server syslog
+apt install rsyslog
+https://packages.debian.org/bullseye/rsyslog
+
+les logs local : R# debug
+
+0 urgence
+1 alerte
+2 critique
+3 error
+4 avertisement
+5 notification
+6 information
+7 debogage
+
+Exemple :
+Sep 14 14:09:09 machine_de_test dhcp service[warning] 110 corps du message
+
+
+R1(config)#logging trap 4
+R1(config)#logging trap warning
+
+R1(config)#logging on
+R1(config)#logging 1.1.1.1
+
+R1(config)#login on-success log
+R1(config)#login on-failure log
+R1(config)#show logging

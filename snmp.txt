@@ -1,0 +1,10 @@
+
+
+snmp-server community batonaug ro SNMP_ACL
+
+snmp-server location NOC_SNMP_MANAGER
+snmp-server contact Wayne World
+snmp-server host 1.1.1.1 version 2c batonaug
+snmp-server enable traps
+ip access-list standard SNMP_ACL
+permit 1.1.1.1

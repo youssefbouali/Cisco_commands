@@ -1,0 +1,90 @@
+
+
+PPP :
+Router(config)# interface serial numéro
+Router(config-if)# encapsulation ppp
+
+
+PPP avec l'authentification PAP:
+Router(config)# username 'nom de deuxième Routeur' password 'mot de passe' 
+Router(config)# interface serial numéro
+Router(config-if)# encapsulation ppp
+Router(config-if)# ppp authentication pap
+Router(config-if)# ppp pap sent-username 'nom du premier Routeur' password 'mot de passe'
+
+
+PPP avec l'authentification CHAP [MD5] :
+Router(config)# username 'nom de deuxième Routeur' password 'mot de passe'
+Router(config)# interface serial numéro
+Router(config-if)# encapsulation ppp
+Router(config-if)# ppp authentication chap
+
+
+PPP avec l'authentification PAP et CHAP:
+Router(config)# username 'nom de deuxième Routeur' password 'mot de passe'
+Router(config)# interface serial numéro
+Router(config-if)# encapsulation ppp
+Router(config-if)# ppp authentication pap chap
+Router(config-if)# ppp pap sent-username 'nom du premier Routeur' password 'mot de passe'
+
+
+
+
+
+
+CCNP ppp multilink :
+
+R1(config)#
+interface multilink 1
+ip addr 1.1.1.1 255.255.255.0
+ppp multilink
+ppp multilink group 1
+
+interface s0/0
+ppp multilink
+ppp multilink group 1
+
+interface s0/1
+no ip adress
+encapsulation ppp
+ppp multilink
+ppp multilink group 1
+
+
+R2(config)#
+interface multilink 1
+ip addr 2.2.2.2 255.255.255.0
+ppp multilink
+ppp multilink group 1
+
+interface s0/0
+ppp multilink
+ppp multilink group 1
+
+interface s0/1
+no ip adress
+encapsulation ppp
+ppp multilink
+ppp multilink group 1
+
+
+show ppp multilink
+
+
+
+CCNA AAA (Security)
+Radius Server : Create user and password R2 pass2
+
+R2(config)# username u1 password pass
+
+R2(config-if)# ppp pap sent-username R2 password pass2
+
+
+
+R1(config-if)# ppp pap sent-username R1 password pass1
+
+
+R1(config)#
+aaa new-model
+radius-server host 1.1.1.1 auth-port 1812 acc-port 1813 key winRadius
+aaa authentication ppp default group radius local

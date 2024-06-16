@@ -1,0 +1,95 @@
+
+
+
+VPN:
+Configuration de tunnel GRE
+Créez une interface de tunnel
+R1(config)# interface tunnel 0
+Spécifiez que le mode de l’interface du tunnel est GRE sur IP 
+R1(config-if)# tunnel mode gre ip
+Configurez une adresse IP pour l’interface du tunnel 
+R1(config-if)# ip address 192.168.2.1 255.255.255.0
+Spécifies l’adresse IP source du tunnel
+R1(config-if)# tunnel source S0/0/0
+Spécifies l’adresse IP de destination du tunnel 
+R1(config-if)# tunnel destination 198.133.219.87
+
+
+
+
+
+
+
+
+crypto
+isakmp enable
+crypto
+isakmp policy 10
+hash md5
+authentication
+pre share
+group 2
+lifetime
+86400
+encryption
+aes 256
+exit
+crypto
+isakmp key P@ssw0rd address 59.59.59.2 255.255.255.0
+crypto
+ipsec transform set IPSECSET esp des esp md5 hmac
+exit
+access
+list 101 permit ip 192.168.1.0 0.0.0.255 192.168.100.0 0.0.0.255
+crypto
+map IPSECMAP 10 ipsec isakmp
+set
+peer 59.59.59.2
+set
+transform set IPSECSET
+match
+address 101
+exit
+interface GigabitEthernet0/0
+crypto
+map IPSECMAP
+exit
+
+
+
+
+
+
+crypto
+isakmp enable
+crypto
+isakmp policy 10
+hash md5
+authentication
+pre share
+group 2
+lifetime
+86400
+encryption
+aes 256
+exit
+crypto
+isakmp key P@ssw0rd address 49.49.49.2 255.255.255.0
+crypto
+ipsec transform set IPSECSET esp des esp md5 hmac
+exit
+access
+list 101 permit ip 192.168.100.0 0.0.0.255 192.168.1.0 0.0.0.255
+crypto
+map IPSECMAP 10 ipsec isakmp
+set
+peer 49.49.49.2
+set
+transform set IPSECSET
+match
+address 101
+exit
+interface GigabitEthernet0/0
+crypto
+map IPSECMAP
+exit

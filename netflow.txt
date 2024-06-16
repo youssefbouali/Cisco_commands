@@ -1,0 +1,29 @@
+Netflow Cisco UDP 2055 4096
+Router
+Switch couche 3 
+
+a. Les flux de réseau :
+Un flux réseau NetFlow est unidirectionnel. Il est caractérisé par 7 champs clés :
+1. le protocole de couche 3 (en général IPv4, mais d'autres protocoles sont possibles)
+2. l'adresse IP source
+3. l'adresse IP destination
+4. le port source (UDP ou TCP, 0 pour les autres protocoles)
+5. le port destination
+6. le champ Type of Service
+7. l'interface en entrée
+
+
+Server Netflow
+
+R1(config)#interface f0/0
+R1(config-if)#ip flow ingress
+R1(config-if)#ip flow egress
+
+R1(config)#interface f0/1
+R1(config-if)#ip flow ingress
+R1(config-if)#ip flow egress
+
+R1(config)#ip flow-export version 1-5-7-9
+R1(config)#ip flow-export destination 1.1.1.1 2055
+
+R1#show ip cache flow
