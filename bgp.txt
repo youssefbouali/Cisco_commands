@@ -1,0 +1,28 @@
+------------------------------------------------------------
+Activez le routage BGP.
+Configurez les voisins (homologues) BGP.
+R1(config)# router bgp 1
+R1(config-router)# bgp router-id 1.1.1.1
+R1(config-router)# network 1.1.1.0 mask 255.255.255.0
+R1(config-router)# neighbor 1.1.1.1 remote-as 1
+
+Exemple de configuration du protocole eBGP
+R1(config)# interface Serial 0
+R1(config-if)# ip address 222.222.10.2 255.255.255.252
+R1(config-iif)# router bgp 100
+R1(config-router)# network 220.220.8.0 mask 255.255.255.0
+R1(config-router)# neighbor 222.222.10.1 remote-as 101
+
+Exemple de configuration du protocole iBGP
+R1(config)# interface Serial 1
+R1(config-if)# ip address 220.220.16.2 255.255.255.252
+R1(config-if)# router bgp 101
+R1(config-router)# network 220.220.16.0 mask 255.255.255.0
+R1(config-router)# neighbor 220.220.16.1 remote-as 101
+
+Vérification de la configuration BGP
+show ip bgp
+show ip bgp summary
+show ip bgp neighbors
+show ip bgp paths
+show ip bgp neighbors [address] [received-routes|routes|advertised-routes| {paths regular-expression}|dampened-routes]

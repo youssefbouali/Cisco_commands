@@ -1,0 +1,19 @@
+----------------------------------------stp----------------------------
+Switch(config-if)# sanning-tree vlan 1 port-priority 112        ‘0-240’
+Switch(config)# spanning-tree vlan 1 root primary
+Switch(config)# spanning-tree vlan 1 root secondary
+Switch(config)# spanning-tree vlan 1 root primary.24576/(secondary.28672)
+Switch(config)# spanning-tree vlan 1 priority 4096     ++4096 +1vlan      ‘0-61440’
+Switch# show spanning-tree
+
+La commande d'interface spanning-tree link-type point-to-point désigne un port particulier 
+en tant que liaison point à point (sans rattachement à un concentrateur).
+La commande de mode privilégié clear spanning-tree detected-protocols est utilisée pour 
+effacer le protocole STP.   Et  Disactivation de tous les protocoles STP
+Switch# clear spanning-tree detected-protocols
+
+La valeur de plage peut être comprise entre 1 et 200 000 000
+Switch(config-if)# spanning-tree cost 25
+
+la commande spanning-tree vlan 1 root primary diameter 5 en mode de configuration globale 
+a été saisie pour attribuer à l’arbre recouvrant un diamètre de cinq commutateurs.

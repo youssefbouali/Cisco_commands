@@ -1,0 +1,25 @@
+----------------------------------------vtp----------------------------------------
+Étape 1 configurez le serveur VTP
+S1# configure terminal
+S1(config)# vtp domain cisco1 
+S1(config)# vtp password 123456
+S1(config)# vtp version 2
+S1(config)# exit
+S1# show vtp status
+S1# show vlan brief
+
+Étape 2 configurez les clients VTP 
+S2(config)# vtp domain cisco1 
+S2(config)# vtp mode client / transport
+S2(config)# exit
+S2# show vtp status 
+
+Étape 3 confirmez et connectez
+show vtp counters
+
+DTP - Modes d'interface négociés
+prennent en charge les modes trunk suivants :
+•	S1(config-if)# switchport mode dynamic auto
+•	S1(config-if)# switchport mode dynamic desirable
+•	S1(config-if)# switchport mode trunk
+•	S1(config-if)# switchport nonegotiate

@@ -1,0 +1,16 @@
+Config Router-Switch
+Router(config)#erase startup-config
+Router(config)#reload
+R1(config-if)#clock rate 128000	   int Serial only
+R1#show running-config	R1#show run
+a. Désactivez la recherche DNS    R(config)#no ip domain-lookup
+c. Attribuez mot de passe du mode d’exécution privilégié
+R(config)#enable secret class
+d. Attribuez cisco comme mots de passe de console et vty.
+R1(config)#line console 0   /  line vty 0 4
+R1(config-line)#password cisco 
+R1(config-line)#login
+R1(config-line)#logging synchronous
+R#copy running-config startup-config
+R(config)#ip http server        R(config)#banner motd #hhhhh#         
+R1(config-if)#description #h#	 Win#ipconfig 1.1.1.2 255..0 1.1.1.1

@@ -1,0 +1,167 @@
+------------------------------------------------------------
+Configuration OSPF Zone unique
+R1(config)# router ospf 10 0>65535
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# auto-cost reference-bandwidth 1000
+R1(config-router)# network 10.10.10.0 0.0.0.255 area 0
+
+R1(config-router)# passive-interface g0/0 
+
+Les commandes d'interface bandwidth et ip ospf cost produisent toutes deux le même résultat 
+: elles fournissent une valeur précise qu'OSPF utilise pour déterminer la meilleure route.
+command :   R1(config-if)# ip ospf cost 15625 
+
+Réglage de la bande passante des interfaces
+R1(config)# int g0/0
+R1(config-if)# bandwidth 1000000
+
+Réglage de la bande passante de référence
+Avec la commande  auto-cost reference-bandwidth     À effectuer sur chaque routeur du domaine OSPF
+Notez que la valeur est exprimée en Mbit/s :
+Gigabit Ethernet : R1(config-router)# auto-cost reference-bandwidth 1000
+10 Gigabit Ethernet : R1(config-router)# auto-cost reference-bandwidth 10000
+
+Priorité OSPF
+R1(config)#int f0/0     R1(config-if)# ip ospf priority  Valeur Default=1  (commande d'interface OSPFv2)
+	R1(config-if)# ipv6 ospf priority  Valeur Default=1  (commande d'interface OSPFv3)
+
+Base de données d'états de liens : Table de topologique : show ip ospf : Les routeurs OSPF échangent des paquets.
+Vérification des voisins OSPF command : show ip ospf neighbor
+Vérification des paramètres du protocole OSPF command : show ip ospf protocol
+Vérification des paramètres d'interface OSPF command : show ip ospf interface brief
+show ip ospf neighbor
+show ip protocols
+show ip ospf
+show ip ospf interface
+show ip ospf interface brief 
+Désactivation de résumé automatique
+R1(config-router)#no auto-summary
+
+R1# clear ip ospf process
+
+Propagation d'une route par défaut
+R2(config)#ip route 0.0.0.0 0.0.0.0 209.165.200.226
+R2(config)#router ospf 10
+R2(config-router)#default-information originate
+
+Vérification de la route par défaut propagée
+show ip route | begin Gateway
+
+Modification des intervalles OSPFv2
+R1(config)# interface s0/0/0
+R1(config-if)# ip ospf hello-inteval 5
+R1(config-if)# ip ospf dead-inteval 20
+
+Redistribution des routes statiques
+R1(config-router)# redistribute static
+
+OSPFv3 
+R1(config)# int g0/0
+R1(config-if)# ipv6 adresse fe80::1 link-local
+R1(config-if)#ipv6 address 2001:acad:caf:2::1/64
+
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# auto-cost reference-bandwidth 1000
+R1(config-router)# int g0/0
+R1(config-if)# bandwidth 1000000
+R1(config-if)# ipv6 ospf 10 area 0
+
+Activer route defaut sur R2 en IPv6 pour OSPFv3
+R2(config)# ipv6 unicast-routing 
+R2(config)#ipv6 route ::/0 2001:DB8:FEED:1::2
+R2(config-router)#router ospf 10
+R2(config-router)#default-information originate
+
+Modification des intervalles OSPFv3
+R1(config)# interface s0/0/0
+R1(config-if)# ipv6 ospf hello-inteval 5
+R1(config-if)# ipv6 ospf dead-inteval 20
+Verification de la propagation de route par defaut sur ipv6         show ipv6 route static
+Verification ospf
+show ipv6 ospf neighbor
+show ipv6 protocols
+show ipv6 route ospf
+show ipv6 ospf interface brief
+
+Vérification des intervalles OSPFv3 de l’interface
+show ip ospf interface s0/0 | include Timer
+show ip ospf neighbor
+
+Configuration de l'authentification MD5 OSPF
+R1(config)# router ospf 10
+R1(config-router)# area (area-id) authentication message-digest (en mode de configuration de routeur) 
+R1(config-if)# ip ospf message-digest-key 1(key) md5 (password) (commande de mode de configuration d'interface)
+
+
+Pour activer l'authentification MD5 par interface, exécutez les commandes suivantes :
+R1(config)# int g0/0 
+R1(config-if)# ip ospf authentication message-digest (commande de mode de configuration d'interface
+R1(config-if)# ip ospf message-digest-key 1(key) md5 (password) (commande de mode de configuration d'interface)
+
+Vérification de l'authentification MD5 OSPF
+show ip ospf interface | include Message
+show ip route ospf
+
+Commandes de dépannage OSPF
+show ip protocols – pour vérifier des informations de configuration OSPF essentielles.
+show ip ospf neighbor  – pour vérifier que le routeur a établi une contiguïté avec ses routeurs voisins. 
+show ip ospf interface  – pour afficher les paramètres OSPF configurés sur une interface, tels que l'ID de processus OSPF.
+show ip ospf  – pour examiner l'ID de processus OSPF et l'ID de routeur. 
+show ip route ospf – pour afficher uniquement les routes apprises par OSPF dans la table de routage.
+clear ip ospf [process-id] process – pour réinitialiser les contiguïtés de voisinage OSPFv2.
+Pour vérifier les interfaces OSPF actives, utilisez la commande  show ip ospf interface
+Pour désactiver une interface passive, utilisez la commande de mode de configuration de routeur no passive-interface
+Vérifiez les routes en utilisant la commande  show ip route 
+
+Commandes de dépannage de OSPFv3
+show ipv6 protocols  – pour vérifier des informations de configuration OSPFv3 essentielles.
+show ipv6 ospf neighbor – pour vérifier que le routeur a établi une contiguïté avec ses routeurs voisins.
+show ipv6 ospf interface  – pour afficher les paramètres OSPFv3 configurés sur une interface.
+show ipv6 ospf  –  pour examiner l'ID de processus OSPF et l'ID de routeur.
+show ipv6 route ospf  – pour afficher uniquement les routes apprises par OSPFv3 dans la table de routage. 
+clear ipv6 ospf [process-id] process – pour réinitialiser les contiguïtés de voisinage OSPFv3.
+
+Voir sur chaque routeur si ils ont bien reçu des routes OSPF. Vérifier si les routes inscrites sont exacts et non manquantes.  Show ip route
+Voir sur chaque routeur si ils ont bien reçu la route par défaut.  S* sur le routeur directement connecté à la route par défaut et  O*SE sur les autres routeur.
+Effectuer des ping à partir des usagés de la topologie vers l’adresse de la route par défaut.
+Voir sur chaque routeur le rôle de chacun (DR, BDR, DRothers)  Show ip opsf interface
+Troubleshooting commands: show ip protocols, show ip ospf neighbor, show ip ospf interface, show ip ospf
+Troubleshooting  OSPFv3 commands: show ipv6 protocols, show ipv6 ospf neighbor, show ipv6 ospf interface, show ipv6 ospf, show ipv6 route ospf, and clear ipv6 ospf [process-id] process
+
+------------------------------------------------------------
+OSPF Multi Zones
+OSPFv2 :
+R1(config)# router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# network 10.10.10.0 0.0.0.255 area 0
+R1(config-router)# network 20.20.20.0 0.0.0.255 area 1 
+R1(config-router)# passive-interface g0/0
+
+Liens virtuel to  area 3   O IA  Type 3
+R1(config)# router ospf 10
+R1(config)# area 2 virtual-link 1.1.1.1(neighbor-id)
+
+OSPFv3 :
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 router ospf 10
+R1(config-router)# router-id 1.1.1.1
+R1(config-router)# int g0/0
+R1(config-if)# ipv6 ospf 10 area 0
+R1(config-if)# int g0/1
+R1(config-if)# ipv6 ospf 10 area 1
+
+Configuration de la récapitulation (résumé) des routes internes à une zone
+R1(config)# router ospf 10
+R1(config-router)# area 1 range 10.1.0.0 255.255.252.0
+
+Vérification du protocole OSPF à zones multiples 
+Vérification de la LSDB OSPF  show ip ospf database 
+show ip ospf | begin Gateway
+show ip ospf neighbor 
+show ip ospf
+show ip ospf interface
+show ip protocols
+show ip ospf interface brief
+show ip route ospf

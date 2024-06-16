@@ -1,0 +1,22 @@
+------------------------vlan---------------------------------------
+S1(config)#vlan 20
+S1(config-vlan)#name Students
+S1#show vlan brief
+
+Attribution de ports aux VLAN
+S2(config)#interface fa0/11
+S2(config-if)#switchport mode access
+S2(config-if)#switchport access vlan 10
+
+Configuration des liaisons trunk IEEE 802.1q
+S1(config)#interface g0/1
+S1(config-if)#switchport mode trunk 
+S1(config-if)#switchport trunk native vlan 99
+S1(config-if)#switchport trunk allowed vlan 99      vlan add/remove 99
+S1#show interfaces f0/1 switchport
+
+Routage traditionell   R(config)#ip routing
+S1(config)#interface vlan 99
+S1(config-if)#ip address 172.31.99.1 255.255.255.0
+S1(config-if)#ip default-gateway 192.168.1.1
+Routage par commutateur     S1(config-if)#switchport trunk encapsulation dot1q

@@ -1,0 +1,59 @@
+-------------------------------------------------------------------------------------------
+ Configuration d'un serveur DHCPv4
+R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.9
+R1(config)# ip dhcp pool R1LAN
+R1(dhcp-config)# network 192.168.10.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.10.1 
+R1(dhcp-config)# dns-server 192.168.20.254
+R1(dhcp-config)# netbios-name-server 192.168.20.254
+R1(dhcp-config)# lease 7
+Pour désactiver le DHCP : no service dhcp
+Vérification d'un serveur DHCPv4       show running-config | section dhcp	  
+show ip dhcp binding	 show ip dhcp server statistics 
+
+Relais DHCPv4	R1(config)#Int g0/0
+R1(config-if)#ip helper-address 192.168.0.1
+Config SLAAC
+R1(config)# ipv6 unicast-routing
+S2(config)# interface vlan 1
+S2(config-if)# ipv6 address autoconfig
+Option DHCP sans état :	L'indicateur O doit être modifié pour 
+passer de 0 à 1 à l'aide de la commande d'interface 
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 dhcp pool PPL1
+R1(dhcpv6-config)# dns-server 2001 :db8 :cafe :aaaa ::5
+R1(dhcpv6-config)# domain name ista.ma
+R1(config)# interface g0/1
+R1(config-if)# ipv6 dhcp server PPL1
+R1(dhcpv6-config)# ipv6 nd other-config-flag
+Configure un routeur en tant que client DHCPv6 sans etat
+R1(config)# interface g0/1
+R1(config-if)# ipv6 enable
+R1(config-if)# ipv6 address autoconfig
+
+Option DHCPv6 avec état 
+R1(config)# ipv6 unicast-routing 
+R1(config)# ipv6 dhcp pool PPL1
+R1(dhcpv6-config)# address prefix 2001 :db8 :cafe :1 ::/64 lifetime infinite
+R1(dhcpv6-config)# dns-server 2001 :db8 :cafe :aaaa ::5
+R1(dhcpv6-config)# domain name ista.ma
+
+R1(config)# interface g0/1
+R1(config-if)# ipv6 address 2001 :db8 :cafe :1 ::1/64
+R1(config-if)# ipv6 dhcp server PPL1
+R1(config-if)# ipv6 nd managed-config-flag. 
+
+Configure un routeur en tant que client DHCPv6 avec etat
+R1(config)# interface g0/1
+R1(config-if)# ipv6 enable
+R1(config-if)# ipv6 address dhcp
+
+Vérifiez le serveur DHCPv6 avec état en utilisant :
+		 show ipv6 dhcp pool
+		 show ipv6 dhcp binding
+Vérifiez le client DHCPv6 avec état en utilisant :
+		 show ipv6 interface
+
+Configuration d'un routeur en tant qu'agent de relais DHCPv6 avec état
+R1(config)# interface g0/0
+R1(config-if)# ipv6 dhcp relay destination 2001 :db8 :cafe :1 ::6

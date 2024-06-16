@@ -1,0 +1,9 @@
+------------------------------------------------------------
+Configuration d’une route statique
+R1(config)# ip route (network-address) (subnet-mask)  (ip-address) |  exit-interface
+Affichage de la table de routage      show ip route.
+Route statique par défaut
+ip route 0.0.0.0 0.0.0.0 1.1.1.1
+ipv6 route ::/0 2001:DB8:ACAD:4::2
+Route statique flottante
+ip route 0.0.0.0 0.0.0.0 1.1.1.1 5(distance administrative)

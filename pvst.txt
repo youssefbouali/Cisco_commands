@@ -1,0 +1,15 @@
+-----------------------------pvst-------------------------------------
+S1(config)#spanning-tree mode pvst
+S1(config)#spanning-tree vlan 1,10,30,50,70 root primary
+S2(config)#spanning-tree vlan 1,10,20,30,40,50,60,70,80,99 root secondary
+S1#show spanning-tree
+
+*****Rapide PVST+*********
+Switch(config)# spanning-tree mode rapid-pvst
+
+******portfast***********************
+S1(config)# int Fa0/6
+S1(config-if)# spanning-tree portfast
+***bpduguard***********************
+S1(config)# int Fa0/6
+S1(config-if)# spanning-tree bpduguard enable

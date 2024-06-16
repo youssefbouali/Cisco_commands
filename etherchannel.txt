@@ -1,0 +1,10 @@
+--------------------etherchannel------------------------------
+S1(confg)# int range Fa0/1-2
+S1(confg-if-range)# channel-group 1 mode active //on = sans protocole
+S1(confg-if-range)# int port-channel 1
+
+Verification de EtherChannel
+show interface Port-channel – affiche l'état général de l'interface de port-channel..
+show etherchannel summary – pour afficher une ligne d'informations unique par canal de port.
+show etherchannel port-channel – pour afficher des informations concernant une interface port-channel spécifique.
+show interfaces etherchannel – peut fournir des informations sur le rôle de l'interface dans l'EtherChannel

@@ -1,0 +1,20 @@
+Configuration de la NAT statique
+R2(config)# ip nat inside source statix 192.168.10.254 209.165.201.5 
+R2(config)# Interface s0/0/0
+R2(config-if)# ip nat inside
+R2(config)# interface s0/0/1 
+R2(config-if)# ip nat outside
+
+Vérification de la NAT statique 		R2# show ip nat translations
+R2# clear ip nat statistics
+R2# show ip nat statistics
+
+Configuration de la NAT dynamique
+ 
+Vérification de la NAT dynamique	show ip nat translations verbose
+Configuration de la PAT : pool d'adresses
+ 
+Configuration de la PAT : adresse unique
+Vérification de la PAT		R2# show ip nat translations
+Configuration de la redirection avec IOS
+Dépannage de la NAT : commande debug		R2# debug ip nat

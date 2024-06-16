@@ -1,0 +1,25 @@
+------------------------------------------------------------
+Configuration du base de protocole RIPv1:
+R3(config)#router rip
+R3(config)#version 1
+R3(config-router)#network 192.168.4.0
+R3(config-router)#network 192.168.5.1
+
+Désactivation de résumé automatique dans RIPv2
+R3(config-router)#no auto-summary
+
+Propagation d'une route par défaut
+R2(config)#ip route 0.0.0.0 0.0.0.0 209.165.200.226
+R2(config-router)#default-information originate
+
+Redistribution des routes statiques
+R2(config-router)#redistribute static
+
+La commande debug ip rip : interprétation
+Dépannage d’une route manquante
+traceroute	-	show ip route
+show ip interface brief
+show cdp neighbors
+Vérification et dépannage de RIPv2
+show ip interface brief	show ip route          debug ip rip	
+Ping       show running-config

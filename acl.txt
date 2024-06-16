@@ -1,0 +1,75 @@
+Listes de contrôle d'accès standard
+# access-list 10 permit 192.168.30.0 0.0.0.255
+
+Listes de contrôle d'accès étendues
+access-list 103 permit tcp 192.168.30.0 0.0.0.255 any eq 80
+
+Saisie des instructions pour les critères
+ACL 1	R1 (config) #access-list 1 permit ip 192.168.10.0 0.0.0.255
+ACL 2	R1 (config) #access-list 2 permit ip 192.168.10.0 0.0.0.255 R1 (config) #access-list 2 deny any
+
+Configuration d'une liste de contrôle d'accès standard
+access-list 2 deny host 192.168.10.10
+access-list 2 permit 192.168.10.0 0.0.0.255
+access-list 2 deny 192.168.0.0 0.0.255.255
+access-list 2 permit 192.0.0.0 0.255.255.255
+
+Configuration d'une liste de contrôle d'accès standard (suite)
+Router(config)# access-list access-list-number deny permit remark source [ source-wildcard ] [ log ]
+Le mot-clé remark est utilisé à des fins de documentation et rend les listes de contrôle d'accès bien plus simples à comprendre.
+
+Logique interne
+R1 (config) #access-list 3 deny 192.168.10.0 0.0.0.255
+R1 (config) #access-list 3 permit host 192.168.10.10
+Access rule can't be configured at higher sequence num as it is part of the existing rule at sequence num 10
+ACL 3: l'instruction d'hôte est en conflit avec l'instruction de plage précédente.
+
+Application de listes de contrôle d'accès standard aux interfaces
+Router(config-if)# ip access-group { access-list-number | access-list-name } { in | out }
+Configuration des listes de contrôle d'accès IPv4 standard
+Application de listes de contrôle d'accès standard aux interfaces (suite)
+R1(config)# access-list 1 deny host 192.168.10.10 
+R1(config)# access-list 1 permit any
+R1(config)# interface g0/0
+R1(config)# ip access-group 1 in
+
+Création des listes de contrôle d'accès standard nommées
+R1(config)# ip access-group 1 in
+
+Création des listes de contrôle d'accès standard nommées
+R1(config)# ip access-list standard/extended name 
+R1(config-std-nacl)# permit/deny/remark (masque_generique) (log) 
+R1(config-if)# ip access-group name in/out 
+
+
+Configuration d'une liste de contrôle d'accès standard pour sécuriser un port VTY
+	Router(config-line)# access-class access-list-number { in [ vrf-also ] | out }
+	Router# show access-lists
+
+Configuration des listes de contrôle d'accès étendues
+
+Application des listes de contrôle d'accès étendues aux interfaces
+ 
+Création des listes de contrôle d'accès étendues nommées
+
+
+Configuration des listes de contrôle d'accès pour limiter les résultats du débogage
+L'administrateur de R2 souhaite s'assurer que le trafic est acheminé correctement grâce à la commande    debug ip packet
+
+Comparaison des listes de contrôle d'accès IPv4 et IPv6
+	Application d'une liste de contrôle d'accès IPv6
+IPv6 utilise la commande ipv6 traffic-filter pour effectuer la même tâche sur les interfaces IPv6.
+	Instructions supplémentaires par défaut
+permit icmp any any nd-na
+permit icmp any any nd-ns
+Configuration des listes de contrôle d'accès IPv6
+Il existe trois étapes de base pour configurer une liste de contrôle d'accès IPv6 :
+	En mode de configuration globale, utilisez la commande ipv6 access-list name pour créer une liste de contrôle d'accès IPv6. 
+	En mode de configuration des listes de contrôle d'accès nommées, utilisez les instructions permit ou deny pour spécifier une ou plusieurs conditions pour déterminer si un paquet est transféré ou abandonné.
+	Retournez au mode d'exécution privilégié à l'aide de la commande end.
+ 
+
+Application d'une liste de contrôle d'accès IPv6 à une interface
+Interface s0/0/0
+Ipv6 traffic-filter NO-R3-LAN-ACCESS in
+R1# show ipv6 interface g0/0
